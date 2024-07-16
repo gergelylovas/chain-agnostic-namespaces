@@ -33,7 +33,7 @@ for different Avalanche chains. Since the P-Chain's `blockchainID` is the same o
 The method for calculating the chain ID is as follows with pseudo-code:
 
 ```
-hex(sha256(concat(testnet_prefix, blockchain_id)))
+first_32_chars(hex(sha256(concat(testnet_prefix, blockchain_id))))
 ```
 
 - `blockchain_id` = `txID` that created the blockchain on the Avalanche P-Chain
