@@ -37,14 +37,17 @@ for chains on the [Fuji Testnet][].
 The method for calculating the chain ID is as follows with pseudo-code:
 
 ```
-base64url(sha256(concat(testnet_prefix, blockchain_id)))
+first_32_chars(base64url(sha256(concat(testnet_prefix, blockchain_id))))
 ```
 
 - `blockchain_id` = `txID` that created the blockchain on the Avalanche P-Chain
-- `testnet_prefix`= `fuji` when the chain was created on the Fuji Testnet; empty string otherwise
+- `testnet_prefix`= `fuji` when the chain was created on the Fuji Testnet; 
+  empty string otherwise
 - `concat`= a string concatenation function
 - `sha256`= a SHA256 hash function
 - `base64url`= a Base64URL encoder
+- `first_32_chars`= a function to extract the first 32 characters of the
+  resulting string and dropping the rest
 
 ### Resolution Method
 
@@ -78,10 +81,13 @@ For example, this Node.js code transforms the above response into a CAIP-2 ident
 const isTestnet = false;
 const blockchainID = "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5";
 const testnetPrefix = isTestnet ? 'fuji' : '';
-const hash = createHmac('sha256', testnetPrefix + blockchainID).digest('base64url');
+const hash = createHash('sha256')
+              .update(testnetPrefix + blockchainID)
+              .digest('base64url')
+              .substring(0, 32);
 const identifier = "avax:" + hash;
 
-console.log(identifier); // prints "avax:9d34d21bde574f31da31120b39c05bda"
+console.log(identifier); // prints "avax:8aDU0Kqh-5d23op-B-r-4YbQFRbsgF9a"
 ```
 
 ### Backwards Compatibility
@@ -95,27 +101,27 @@ This is a list of manually composed examples
 ```
 # Avalanche P Chain Mainnet
 # blockchainID: 11111111111111111111111111111111LpoYY
-avax:mCvllN_QAxD8U3GYUxGIdMiIj8ynJMt1
+avax:Rr9hnPVPxuUvrdCul-vjEsU1zmqKqRDo
 
 # Avalanche C Chain Mainnet
 # blockchainID: 2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5
-avax:nTTSG95XTzHaMRILOcBb2pkjULqXaX6H
+avax:8aDU0Kqh-5d23op-B-r-4YbQFRbsgF9a
 
 # Avalanche X Chain Mainnet
 # blockchainID: 2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM
-avax:z2Hw3wJ9jbIfuel5CnVToxau56UNPGJR
+avax:imji8papUf2EhV3le337w1vgFauqkJg-
 
 # Avalanche P Chain Testnet
 # blockchainID: 11111111111111111111111111111111LpoYY
-avax:17DmTJQz_3DY5aI1w8iQdSpFxz2cpqsk
+avax:Sj7NVE3jXTbJvwFAiu7OEUo_8g8ctXMG
 
 # Avalanche C Chain Testnet
 # blockchainID: yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp
-avax:jxwORl7x57wM74xOu9CN9a7LGYNWu1tk
+avax:YRLfeDBJpfEqUWe2FYR1OpXsnDDZeKWd
 
 # Avalanche X Chain Testnet
 # blockchainID: 2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm
-avax:8pQkExBb792USRs9PlRC0GhfTZt7KB1n
+avax:8AJTpRj3SAqv1e80Mtl9em08LhvKEbkl
 
 ```
 
